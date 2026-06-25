@@ -68,6 +68,12 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-rose-500 border border-white" id="badge-gsheet-status"></span>
                         Sambung Google Sheet
                     </button>
+
+                    <!-- Butang Sambung Firebase (penyegerakan dua hala) dengan Indikator Status -->
+                    <button id="btn-buka-modal-firebase" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 border border-indigo-500/30">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 border border-white" id="badge-firebase-status"></span>
+                        Sambung Firebase
+                    </button>
                 </div>
             </div>
         </header>
@@ -150,8 +156,18 @@
                         
                         <form id="form-perbelanjaan" class="space-y-4">
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Tarikh Transaksi <span class="text-red-500">*</span></label>
-                                <input type="date" id="input-tarikh" required class="w-full rounded-xl border border-slate-200 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 focus:bg-white transition-all text-sm">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Tarikh <span class="text-red-500">*</span></label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-500 mb-1">Mula</label>
+                                        <input type="date" id="input-tarikh-mula" required class="w-full rounded-xl border border-slate-200 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 focus:bg-white transition-all text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-500 mb-1">Tamat</label>
+                                        <input type="date" id="input-tarikh-tamat" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 focus:bg-white transition-all text-sm">
+                                    </div>
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-1">Tarikh Tamat pilihan. Jika dikosongkan, ia disamakan dengan Tarikh Mula.</p>
                             </div>
 
                             <div>
@@ -567,6 +583,119 @@
         </div>
     </div>
 
+    <!-- MODAL INTEGRASI FIREBASE (PENYEGERAKAN DUA HALA) -->
+    <div id="modal-firebase" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 invisible transition-all duration-300">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 m-4 max-h-[90vh] overflow-y-auto transform scale-95 transition-all duration-300" id="modal-firebase-content">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-5">
+                <div class="flex items-center gap-2">
+                    <span class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">🔥</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Penyegerakan Firebase</h3>
+                        <p class="text-xs text-slate-500">Selaraskan data merentas peranti melalui pangkalan data terpusat</p>
+                    </div>
+                </div>
+                <button id="btn-tutup-firebase" class="text-slate-400 p-1.5 hover:bg-slate-50 rounded-lg">✕</button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3 text-xs text-indigo-900 leading-relaxed">
+                    <p class="font-semibold mb-1">Status: <span id="teks-status-firebase">Tidak disambungkan</span></p>
+                    <p>Tampal blok konfigurasi Firebase projek anda di bawah. Anda boleh menyalinnya daripada Firebase Console melalui Project Settings, di bahagian "Your apps".</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Konfigurasi Firebase (firebaseConfig) <span class="text-red-500">*</span></label>
+                    <textarea id="input-firebase-config" rows="9" placeholder='const firebaseConfig = {
+  apiKey: "...",
+  authDomain: "...",
+  projectId: "...",
+  storageBucket: "...",
+  messagingSenderId: "...",
+  appId: "..."
+};' class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white font-mono placeholder:text-slate-400"></textarea>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="button" id="btn-putus-firebase" class="w-1/2 bg-slate-100 text-slate-700 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-200">Putuskan Sambungan</button>
+                    <button type="button" id="btn-simpan-firebase" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-semibold shadow-sm">Simpan & Aktifkan</button>
+                </div>
+
+                <p class="text-[11px] text-slate-400 leading-relaxed border-t border-slate-100 pt-3">
+                    Nota: Pastikan kaedah log masuk "Anonymous" diaktifkan dalam Firebase Authentication, dan peraturan Firestore membenarkan akses. Selepas disambungkan, halaman akan dimuatkan semula untuk mengaktifkan penyegerakan masa nyata.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SUNTING REKOD TRANSAKSI -->
+    <div id="modal-edit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 invisible transition-all duration-300">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 m-4 max-h-[90vh] overflow-y-auto transform scale-95 transition-all duration-300" id="modal-edit-content">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-5">
+                <div class="flex items-center gap-2">
+                    <span class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">✏️</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Sunting Rekod Transaksi</h3>
+                        <p class="text-xs text-slate-500">Kemas kini maklumat rekod perbelanjaan</p>
+                    </div>
+                </div>
+                <button type="button" id="btn-tutup-edit" class="text-slate-400 p-1.5 hover:bg-slate-50 rounded-lg">✕</button>
+            </div>
+
+            <form id="form-edit" class="space-y-4">
+                <input type="hidden" id="edit-id">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Tarikh <span class="text-red-500">*</span></label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-500 mb-1">Mula</label>
+                            <input type="date" id="edit-tarikh-mula" required class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-500 mb-1">Tamat</label>
+                            <input type="date" id="edit-tarikh-tamat" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori Utama <span class="text-red-500">*</span></label>
+                    <select id="edit-kategori" required class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white">
+                        <option value="K1">1. Induk/Pusat</option>
+                        <option value="K2">2. Unit Pembangunan Kurikulum dan Koordinator Program</option>
+                        <option value="K3">3. Unit Pembangunan Staf Akademik dan Inovasi PdP</option>
+                        <option value="K4">4. Unit Audit Dalaman (Akademik)</option>
+                        <option value="K5">5. Kerjasama Fakulti/Pusat</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Aktiviti <span class="text-red-500">*</span></label>
+                    <select id="edit-aktiviti" required class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white">
+                        <option value="ACT1">Keraian Mesyuarat</option>
+                        <option value="ACT2">Kursus/ Bengkel Dalaman</option>
+                        <option value="ACT3">Kursus/ Bengkel Luaran</option>
+                        <option value="ACT4">Langganan</option>
+                        <option value="ACT5">Lawatan Penanda Aras</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Perincian / Sebab Belanja <span class="text-red-500">*</span></label>
+                    <input type="text" id="edit-perincian" required class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan (Pilihan)</label>
+                    <input type="text" id="edit-catatan" class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Jumlah (RM) <span class="text-red-500">*</span></label>
+                    <input type="number" id="edit-jumlah" step="0.01" min="0" required class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white">
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="button" id="btn-batal-edit" class="w-1/2 bg-slate-100 text-slate-700 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-200">Batal</button>
+                    <button type="submit" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-semibold shadow-sm">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL CONFIRMATION IMPORT CSV -->
     <div id="modal-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 invisible transition-all duration-300">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 m-4 transform scale-95 transition-all duration-300" id="modal-import-content">
@@ -665,7 +794,7 @@
         // menggunakan memori tempatan pelayar (localStorage). Untuk
         // mengaktifkan penyegerakan awan, isikan firebaseConfig dengan kredensial
         // projek anda dan tukar isFirebaseEnabled kepada true.
-        const firebaseConfig = {
+        let firebaseConfig = {
             apiKey: "",
             authDomain: "",
             projectId: "",
@@ -797,17 +926,28 @@
             senarai.forEach(t => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition-colors';
-                const tarikh = new Date(t.tarikh).toLocaleDateString('ms-MY', { year: 'numeric', month: 'short', day: 'numeric' });
+                const opsiTarikh = { year: 'numeric', month: 'short', day: 'numeric' };
+                const tarikhMula = new Date(t.tarikh).toLocaleDateString('ms-MY', opsiTarikh);
+                let paparTarikh = tarikhMula;
+                if (t.tarikhTamat && t.tarikhTamat !== t.tarikh) {
+                    const tarikhTamat = new Date(t.tarikhTamat).toLocaleDateString('ms-MY', opsiTarikh);
+                    paparTarikh = `${tarikhMula} <span class="text-slate-400">hingga</span> ${tarikhTamat}`;
+                }
                 tr.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-slate-600">${tarikh}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-slate-600">${paparTarikh}</td>
                     <td class="px-6 py-4 text-slate-700">${NAMA_KATEGORI[t.kategori] || t.kategori || '-'}</td>
                     <td class="px-6 py-4 text-slate-700">${NAMA_AKTIVITI[t.aktiviti] || t.aktiviti || '-'}</td>
                     <td class="px-6 py-4 text-slate-700 max-w-xs">${(t.perincian || '').replace(/</g, '&lt;')}</td>
                     <td class="px-6 py-4 text-right font-semibold text-slate-900 whitespace-nowrap">${formatRM(t.jumlah)}</td>
                     <td class="td-tindakan px-6 py-4 text-center">
-                        <button type="button" data-id="${t.id}" class="btn-padam text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-1.5 rounded-lg transition-all" title="Padam rekod">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button type="button" data-id="${t.id}" class="btn-edit text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 p-1.5 rounded-lg transition-all" title="Sunting rekod">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                            </button>
+                            <button type="button" data-id="${t.id}" class="btn-padam text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-1.5 rounded-lg transition-all" title="Padam rekod">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                        </div>
                     </td>`;
                 tbody.appendChild(tr);
             });
@@ -943,7 +1083,7 @@
                 try {
                     const ref = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('transactions');
                     await ref.doc(String(rekod.id)).set({
-                        tarikh: rekod.tarikh, kategori: rekod.kategori, aktiviti: rekod.aktiviti,
+                        tarikh: rekod.tarikh, tarikhTamat: rekod.tarikhTamat || rekod.tarikh, kategori: rekod.kategori, aktiviti: rekod.aktiviti,
                         perincian: rekod.perincian, catatan: rekod.catatan || '', jumlah: rekod.jumlah
                     });
                     return; // listener masa nyata akan mengemaskini paparan
@@ -955,9 +1095,25 @@
             kemaskiniSemua();
         }
 
+        // Hantar satu rekod ke Google Sheets (jika pautan dikonfigurasi)
+        async function hantarRekodKeGsheet(rekod) {
+            if (!gsheetUrl) return;
+            try {
+                await fetch(gsheetUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'tambah', rekod: rekod, tahun: new Date(rekod.tarikh).getFullYear() })
+                });
+            } catch (e) {
+                console.error('Gagal menghantar rekod ke Google Sheets:', e);
+            }
+        }
+
         document.getElementById('form-perbelanjaan')?.addEventListener('submit', async function (e) {
             e.preventDefault();
-            const tarikh = document.getElementById('input-tarikh').value;
+            const tarikh = document.getElementById('input-tarikh-mula').value;
+            let tarikhTamat = document.getElementById('input-tarikh-tamat').value;
             const kategori = document.getElementById('input-kategori').value;
             const aktiviti = document.getElementById('input-aktiviti').value;
             const perincian = document.getElementById('input-perincian').value.trim();
@@ -968,16 +1124,27 @@
                 paparNotifikasi('Maklumat Tidak Lengkap', 'Sila lengkapkan semua medan wajib dengan nilai yang sah.', true);
                 return;
             }
+            if (!tarikhTamat) tarikhTamat = tarikh; // jika kosong, samakan dengan tarikh mula
+            if (new Date(tarikhTamat) < new Date(tarikh)) {
+                paparNotifikasi('Tarikh Tidak Sah', 'Tarikh Tamat tidak boleh lebih awal daripada Tarikh Mula.', true);
+                return;
+            }
 
-            await tambahTransaksi({
+            const rekod = {
                 id: String(Date.now()) + Math.floor(Math.random() * 1000),
-                tarikh, kategori, aktiviti, perincian, catatan, jumlah
-            });
+                tarikh, tarikhTamat, kategori, aktiviti, perincian, catatan, jumlah
+            };
+
+            await tambahTransaksi(rekod);
+            hantarRekodKeGsheet(rekod); // hantar ke Google Sheets secara automatik (jika disambungkan)
 
             this.reset();
-            const inputTarikh = document.getElementById('input-tarikh');
-            if (inputTarikh) inputTarikh.value = `${tahunAktif}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
-            paparNotifikasi('Rekod Disimpan', 'Rekod perbelanjaan baharu berjaya didaftarkan.');
+            const inputMula = document.getElementById('input-tarikh-mula');
+            if (inputMula) inputMula.value = `${tahunAktif}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
+            const mesej = gsheetUrl
+                ? 'Rekod perbelanjaan baharu disimpan dan dihantar ke Google Sheets.'
+                : 'Rekod perbelanjaan baharu berjaya didaftarkan.';
+            paparNotifikasi('Rekod Disimpan', mesej);
         });
 
         // ---------- 0.12 PADAM TRANSAKSI (DELEGASI ACARA) ----------
@@ -998,6 +1165,84 @@
                 kemaskiniSemua();
             }
             paparNotifikasi('Rekod Dipadam', 'Rekod perbelanjaan telah dialih keluar.');
+        });
+
+        // ---------- 0.12b SUNTING TRANSAKSI ----------
+        function tarikhUntukInput(nilai) {
+            const d = new Date(nilai);
+            if (isNaN(d.getTime())) return '';
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const hari = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${hari}`;
+        }
+
+        // Delegasi klik butang sunting
+        document.getElementById('table-body')?.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-edit');
+            if (!btn) return;
+            const id = btn.getAttribute('data-id');
+            const rekod = transaksi.find(t => String(t.id) === String(id));
+            if (!rekod) {
+                paparNotifikasi('Rekod Tidak Dijumpai', 'Rekod ini mungkin telah dialih keluar.', true);
+                return;
+            }
+            document.getElementById('edit-id').value = rekod.id;
+            document.getElementById('edit-tarikh-mula').value = tarikhUntukInput(rekod.tarikh);
+            document.getElementById('edit-tarikh-tamat').value = tarikhUntukInput(rekod.tarikhTamat || rekod.tarikh);
+            document.getElementById('edit-kategori').value = rekod.kategori || 'K1';
+            document.getElementById('edit-aktiviti').value = rekod.aktiviti || 'ACT1';
+            document.getElementById('edit-perincian').value = rekod.perincian || '';
+            document.getElementById('edit-catatan').value = rekod.catatan || '';
+            document.getElementById('edit-jumlah').value = rekod.jumlah;
+            bukaModal('modal-edit', 'modal-edit-content');
+        });
+
+        ['btn-tutup-edit', 'btn-batal-edit'].forEach(idBtn => {
+            document.getElementById(idBtn)?.addEventListener('click', () => tutupModal('modal-edit', 'modal-edit-content'));
+        });
+
+        async function editTransaksi(id, dataBaharu) {
+            if (isFirebaseEnabled && db) {
+                try {
+                    await db.collection('artifacts').doc(appId).collection('public').doc('data')
+                        .collection('transactions').doc(String(id)).set(dataBaharu, { merge: true });
+                    return; // pendengar masa nyata akan mengemaskini paparan
+                } catch (e) {
+                    console.error('Gagal mengemas kini di Firestore, beralih ke memori tempatan.', e);
+                }
+            }
+            const idx = transaksi.findIndex(t => String(t.id) === String(id));
+            if (idx !== -1) {
+                transaksi[idx] = Object.assign({}, transaksi[idx], dataBaharu);
+                kemaskiniSemua();
+            }
+        }
+
+        document.getElementById('form-edit')?.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const tarikh = document.getElementById('edit-tarikh-mula').value;
+            let tarikhTamat = document.getElementById('edit-tarikh-tamat').value;
+            const kategori = document.getElementById('edit-kategori').value;
+            const aktiviti = document.getElementById('edit-aktiviti').value;
+            const perincian = document.getElementById('edit-perincian').value.trim();
+            const catatan = document.getElementById('edit-catatan').value.trim();
+            const jumlah = parseFloat(document.getElementById('edit-jumlah').value);
+
+            if (!tarikh || !kategori || !aktiviti || !perincian || !(jumlah > 0)) {
+                paparNotifikasi('Maklumat Tidak Lengkap', 'Sila lengkapkan semua medan wajib dengan nilai yang sah.', true);
+                return;
+            }
+            if (!tarikhTamat) tarikhTamat = tarikh;
+            if (new Date(tarikhTamat) < new Date(tarikh)) {
+                paparNotifikasi('Tarikh Tidak Sah', 'Tarikh Tamat tidak boleh lebih awal daripada Tarikh Mula.', true);
+                return;
+            }
+
+            await editTransaksi(id, { tarikh, tarikhTamat, kategori, aktiviti, perincian, catatan, jumlah });
+            tutupModal('modal-edit', 'modal-edit-content');
+            paparNotifikasi('Rekod Dikemas Kini', 'Perubahan pada rekod perbelanjaan berjaya disimpan.');
         });
 
         // ---------- 0.13 PEMILIHAN TAHUN ----------
@@ -1058,8 +1303,12 @@
             });
             peruntukan[tahunAktif] = baharu;
             kemaskiniSemua();
+            tulisPeruntukanFirestore(); // segerak tetapan bajet ke Firestore (jika disambungkan)
             tutupModal('modal-bajet', 'modal-content');
-            paparNotifikasi('Belanjawan Dikemas Kini', `Had peruntukan bagi Tahun ${tahunAktif} berjaya disimpan.`);
+            const mesej = isFirebaseEnabled
+                ? `Had peruntukan bagi Tahun ${tahunAktif} disimpan dan disegerakkan ke Firebase.`
+                : `Had peruntukan bagi Tahun ${tahunAktif} berjaya disimpan.`;
+            paparNotifikasi('Belanjawan Dikemas Kini', mesej);
         });
 
         // ---------- 0.15 MODAL GOOGLE SHEETS ----------
@@ -1098,7 +1347,7 @@
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ tahun: tahunAktif, rekod: dapatkanTransaksiTahunAktif() })
+                    body: JSON.stringify({ action: 'pukal', tahun: tahunAktif, rekod: dapatkanTransaksiTahunAktif() })
                 });
                 paparNotifikasi('Hantaran Selesai', 'Data telah dihantar ke Google Sheets (mod no-cors).');
             } catch (e) {
@@ -1125,9 +1374,9 @@
         document.getElementById('btn-eksport')?.addEventListener('click', function () {
             const senarai = transaksiTertapis();
             if (senarai.length === 0) { paparNotifikasi('Tiada Data', 'Tiada rekod untuk dieksport.', true); return; }
-            let csv = "ID,Tarikh,Kod Kategori,Kategori Utama,Kod Aktiviti,Aktiviti,Perincian,Catatan,Jumlah (RM)\r\n";
+            let csv = "ID,Tarikh Mula,Tarikh Tamat,Kod Kategori,Kategori Utama,Kod Aktiviti,Aktiviti,Perincian,Catatan,Jumlah (RM)\r\n";
             senarai.forEach(t => {
-                const baris = [t.id, t.tarikh, t.kategori, NAMA_KATEGORI[t.kategori] || '', t.aktiviti, NAMA_AKTIVITI[t.aktiviti] || '', t.perincian || '', t.catatan || '', Number(t.jumlah).toFixed(2)];
+                const baris = [t.id, t.tarikh, t.tarikhTamat || t.tarikh, t.kategori, NAMA_KATEGORI[t.kategori] || '', t.aktiviti, NAMA_AKTIVITI[t.aktiviti] || '', t.perincian || '', t.catatan || '', Number(t.jumlah).toFixed(2)];
                 csv += baris.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + "\r\n";
             });
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
@@ -1155,16 +1404,132 @@
 
         function setupRealtimeListeners(user) {
             if (!isFirebaseEnabled || !db) return;
-            const ref = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('transactions');
-            ref.onSnapshot(snap => {
+
+            // Pendengar transaksi (dua hala)
+            const refTransaksi = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('transactions');
+            refTransaksi.onSnapshot(snap => {
                 transaksi = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
                 kemaskiniSemua();
-            }, err => console.error('Ralat listener Firestore:', err));
+            }, err => console.error('Ralat pendengar transaksi:', err));
+
+            // Pendengar tetapan bajet (dua hala)
+            const refPeruntukan = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('settings').doc('peruntukan');
+            refPeruntukan.onSnapshot(snap => {
+                if (snap.exists) {
+                    const d = snap.data();
+                    if (d && d.data && typeof d.data === 'object') {
+                        peruntukan = d.data;
+                        kemaskiniSemua();
+                    }
+                }
+            }, err => console.error('Ralat pendengar peruntukan:', err));
         }
 
+        // Tulis tetapan bajet ke Firestore (dipanggil semasa menyimpan had bajet)
+        async function tulisPeruntukanFirestore() {
+            if (!isFirebaseEnabled || !db) return;
+            try {
+                await db.collection('artifacts').doc(appId).collection('public').doc('data')
+                    .collection('settings').doc('peruntukan').set({ data: peruntukan }, { merge: true });
+            } catch (e) {
+                console.error('Gagal menyegerak tetapan bajet ke Firestore:', e);
+            }
+        }
+
+        // ---------- 0.19b PENGURUSAN KONFIGURASI FIREBASE ----------
+        const FIREBASE_KEY = 'ppa_kias_firebase_v1';
+
+        function muatKonfigFirebase() {
+            try {
+                const raw = window.localStorage.getItem(FIREBASE_KEY);
+                if (!raw) return;
+                const o = JSON.parse(raw);
+                if (o && o.config && o.config.projectId) {
+                    firebaseConfig = o.config;
+                    isFirebaseEnabled = !!o.enabled;
+                }
+            } catch (e) {
+                console.warn('Gagal memuat konfigurasi Firebase.', e);
+            }
+        }
+
+        function huraikanKonfigFirebase(teks) {
+            const t = (teks || '').trim();
+            const mula = t.indexOf('{');
+            const akhir = t.lastIndexOf('}');
+            if (mula === -1 || akhir === -1) throw new Error('Format konfigurasi tidak sah.');
+            const dalam = t.slice(mula + 1, akhir);
+            const cfg = {};
+            const re = /([A-Za-z0-9_]+)\s*:\s*["']([^"']*)["']/g;
+            let m;
+            while ((m = re.exec(dalam)) !== null) { cfg[m[1]] = m[2]; }
+            if (!cfg.apiKey || !cfg.projectId || !cfg.appId) {
+                throw new Error('Konfigurasi tidak lengkap (perlu sekurang-kurangnya apiKey, projectId dan appId).');
+            }
+            return cfg;
+        }
+
+        function kemaskiniBadgeFirebase() {
+            const badge = document.getElementById('badge-firebase-status');
+            if (badge) {
+                badge.classList.toggle('bg-emerald-400', isFirebaseEnabled);
+                badge.classList.toggle('bg-rose-500', !isFirebaseEnabled);
+            }
+            const teks = document.getElementById('teks-status-firebase');
+            if (teks) {
+                teks.textContent = isFirebaseEnabled
+                    ? ('Disambungkan' + (firebaseConfig.projectId ? ` (${firebaseConfig.projectId})` : ''))
+                    : 'Tidak disambungkan';
+            }
+        }
+
+        document.getElementById('btn-buka-modal-firebase')?.addEventListener('click', function () {
+            const ta = document.getElementById('input-firebase-config');
+            if (ta && firebaseConfig && firebaseConfig.projectId) {
+                ta.value = 'const firebaseConfig = ' + JSON.stringify(firebaseConfig, null, 2) + ';';
+            }
+            kemaskiniBadgeFirebase();
+            bukaModal('modal-firebase', 'modal-firebase-content');
+        });
+
+        document.getElementById('btn-tutup-firebase')?.addEventListener('click', () => tutupModal('modal-firebase', 'modal-firebase-content'));
+
+        document.getElementById('btn-simpan-firebase')?.addEventListener('click', function () {
+            const teks = document.getElementById('input-firebase-config')?.value || '';
+            let cfg;
+            try {
+                cfg = huraikanKonfigFirebase(teks);
+            } catch (e) {
+                paparNotifikasi('Konfigurasi Tidak Sah', e.message, true);
+                return;
+            }
+            try {
+                window.localStorage.setItem(FIREBASE_KEY, JSON.stringify({ config: cfg, enabled: true }));
+            } catch (e) {
+                paparNotifikasi('Ralat Storan', 'Gagal menyimpan konfigurasi pada pelayar.', true);
+                return;
+            }
+            paparNotifikasi('Firebase Disambung', 'Memuatkan semula untuk mengaktifkan penyegerakan masa nyata...');
+            setTimeout(() => window.location.reload(), 1000);
+        });
+
+        document.getElementById('btn-putus-firebase')?.addEventListener('click', function () {
+            try {
+                const raw = window.localStorage.getItem(FIREBASE_KEY);
+                const o = raw ? JSON.parse(raw) : { config: firebaseConfig };
+                window.localStorage.setItem(FIREBASE_KEY, JSON.stringify({ config: o.config || firebaseConfig, enabled: false }));
+            } catch (e) {
+                window.localStorage.removeItem(FIREBASE_KEY);
+            }
+            paparNotifikasi('Sambungan Diputuskan', 'Memuatkan semula untuk beralih ke memori tempatan...');
+            setTimeout(() => window.location.reload(), 1000);
+        });
+
         // ---------- 0.20 PEMULAAN AWAL (sebelum window.onload skrip kedua) ----------
+        muatKonfigFirebase();   // muatkan konfig Firebase tersimpan (jika ada) sebelum onload
         muatData();
         kemaskiniBadgeGsheet();
+        kemaskiniBadgeFirebase();
         // Paparkan carta lalai (bar) pada permulaan
         document.addEventListener('DOMContentLoaded', () => { tukarCarta('bar'); });
 
@@ -1619,7 +1984,11 @@
 
             const headers = ["Tarikh", "Kategori Utama", "Aktiviti / Komponen", "Perincian / Sebab Belanja", "Jumlah (RM)"];
             const rows = senarai.map(t => {
-                const tarikh = new Date(t.tarikh).toLocaleDateString('ms-MY', { year: 'numeric', month: 'short', day: 'numeric' });
+                const opsi = { year: 'numeric', month: 'short', day: 'numeric' };
+                let tarikh = new Date(t.tarikh).toLocaleDateString('ms-MY', opsi);
+                if (t.tarikhTamat && t.tarikhTamat !== t.tarikh) {
+                    tarikh += ' hingga ' + new Date(t.tarikhTamat).toLocaleDateString('ms-MY', opsi);
+                }
                 return [tarikh, NAMA_KATEGORI[t.kategori] || t.kategori || '-', NAMA_AKTIVITI[t.aktiviti] || t.aktiviti || '-', t.perincian || '-', formatRM(t.jumlah)];
             });
 
@@ -1680,7 +2049,7 @@
                 }
             }
             
-            const inputTarikh = document.getElementById('input-tarikh');
+            const inputTarikh = document.getElementById('input-tarikh-mula');
             if (inputTarikh) {
                 inputTarikh.value = `${tahunAktif}-05-01`;
             }
