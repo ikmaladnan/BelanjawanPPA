@@ -606,12 +606,13 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Konfigurasi Firebase (firebaseConfig) <span class="text-red-500">*</span></label>
                     <textarea id="input-firebase-config" rows="9" placeholder='const firebaseConfig = {
-  apiKey: "...",
-  authDomain: "...",
-  projectId: "...",
-  storageBucket: "...",
-  messagingSenderId: "...",
-  appId: "..."
+  apiKey: "AIzaSyDeurFWf8KEWLGJKA2FAuBPszsoXIFCL2k",
+  authDomain: "bajet-ppa.firebaseapp.com",
+  projectId: "bajet-ppa",
+  storageBucket: "bajet-ppa.firebasestorage.app",
+  messagingSenderId: "1042526189973",
+  appId: "1:1042526189973:web:b7d26f3da47b3371a29e9c",
+  measurementId: "G-ZV2247C87Z"
 };' class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white font-mono placeholder:text-slate-400"></textarea>
                 </div>
 
@@ -789,11 +790,19 @@
         let chartPieInstance = null;
         let chartYearlyInstance = null;
 
-        // ---------- 0.3 KONFIGURASI FIREBASE (PILIHAN) ----------
-        // Biarkan isFirebaseEnabled = false untuk beroperasi sepenuhnya
-        // menggunakan memori tempatan pelayar (localStorage). Untuk
-        // mengaktifkan penyegerakan awan, isikan firebaseConfig dengan kredensial
-        // projek anda dan tukar isFirebaseEnabled kepada true.
+        // ====================================================================
+        // 0.3 KONFIGURASI FIREBASE
+        // ====================================================================
+        // MOD ONLINE SEPENUHNYA (semua peranti hanya buka pautan, tanpa menampal):
+        //   Isikan keenam-enam medan di bawah dengan kredensial projek Firebase
+        //   anda (salin daripada Firebase Console). Sebaik sahaja "projectId"
+        //   diisi, penyegerakan awan AKAN DIAKTIFKAN secara automatik untuk
+        //   setiap peranti yang membuka fail ini. Tiada langkah lain diperlukan.
+        //
+        //   Biarkan kosong untuk beroperasi menggunakan memori tempatan
+        //   (localStorage) sahaja, atau guna butang "Sambung Firebase" untuk
+        //   menyambung secara per-peranti.
+        // --------------------------------------------------------------------
         let firebaseConfig = {
             apiKey: "",
             authDomain: "",
@@ -802,7 +811,8 @@
             messagingSenderId: "",
             appId: ""
         };
-        let isFirebaseEnabled = false;      // tukar true selepas mengisi config sah
+        // Diaktifkan secara automatik jika konfigurasi tetap di atas telah diisi.
+        let isFirebaseEnabled = false;
         const appId = 'ppa-kias-bajet';
         let auth = null;
         let db = null;
@@ -1526,7 +1536,10 @@
         });
 
         // ---------- 0.20 PEMULAAN AWAL (sebelum window.onload skrip kedua) ----------
-        muatKonfigFirebase();   // muatkan konfig Firebase tersimpan (jika ada) sebelum onload
+        // Mod online sepenuhnya: jika konfigurasi tetap telah diisi dalam kod,
+        // aktifkan penyegerakan secara automatik untuk setiap peranti yang membuka pautan.
+        if (firebaseConfig && firebaseConfig.projectId) { isFirebaseEnabled = true; }
+        muatKonfigFirebase();   // sambungan per-peranti dalam localStorage boleh menggantikan tetapan di atas
         muatData();
         kemaskiniBadgeGsheet();
         kemaskiniBadgeFirebase();
