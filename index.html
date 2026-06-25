@@ -16,9 +16,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <!-- SDK Firebase Compat untuk Storan Awan Kekal (Cloud Persistence Layer) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     
     <style>
         body {
@@ -63,17 +60,6 @@
                         ⚙️ Tetapan Bajet <span id="span-tahun-btn">2026</span>
                     </button>
 
-                    <!-- Butang Sambung Google Sheet dengan Indikator Status -->
-                    <button id="btn-buka-modal-gsheet" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 border border-emerald-500/30">
-                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 border border-white" id="badge-gsheet-status"></span>
-                        Sambung Google Sheet
-                    </button>
-
-                    <!-- Butang Sambung Firebase (penyegerakan dua hala) dengan Indikator Status -->
-                    <button id="btn-buka-modal-firebase" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 border border-indigo-500/30">
-                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 border border-white" id="badge-firebase-status"></span>
-                        Sambung Firebase
-                    </button>
                 </div>
             </div>
         </header>
@@ -548,85 +534,6 @@
         </div>
     </div>
 
-    <!-- MODAL INTEGRASI GOOGLE SHEETS -->
-    <div id="modal-gsheet" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 invisible transition-all duration-300">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 m-4 max-h-[90vh] overflow-y-auto transform scale-95 transition-all duration-300" id="modal-gsheet-content">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-5">
-                <div class="flex items-center gap-2">
-                    <span class="p-2 bg-emerald-50 text-emerald-600 rounded-lg">📊</span>
-                    <div>
-                        <h3 class="text-lg font-bold text-slate-900">Integrasi Google Sheets</h3>
-                        <p class="text-xs text-slate-500">Pautan ini akan disimpan kekal ke storan awan</p>
-                    </div>
-                </div>
-                <button id="btn-tutup-gsheet" class="text-slate-400 p-1.5 hover:bg-slate-50 rounded-lg">✕</button>
-            </div>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Web App URL Google Apps Script <span class="text-red-500">*</span></label>
-                    <input type="text" id="input-gsheet-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 focus:bg-white font-medium">
-                </div>
-
-                <div class="flex gap-2">
-                    <button type="button" id="btn-batal-gsheet" class="w-1/2 bg-slate-100 text-slate-700 py-2.5 rounded-xl text-xs font-semibold">Batal</button>
-                    <button type="button" id="btn-simpan-gsheet" class="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-semibold shadow-sm">Simpan & Sambung</button>
-                </div>
-
-                <div class="border-t border-slate-100 pt-4 space-y-3">
-                    <h4 class="text-xs font-bold text-slate-700">Tindakan Data:</h4>
-                    <button type="button" id="btn-hantar-pukal-gsheet" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5">
-                        📤 Hantar Semua Data Semasa ke Google Sheets
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL INTEGRASI FIREBASE (PENYEGERAKAN DUA HALA) -->
-    <div id="modal-firebase" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 invisible transition-all duration-300">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 m-4 max-h-[90vh] overflow-y-auto transform scale-95 transition-all duration-300" id="modal-firebase-content">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-5">
-                <div class="flex items-center gap-2">
-                    <span class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">🔥</span>
-                    <div>
-                        <h3 class="text-lg font-bold text-slate-900">Penyegerakan Firebase</h3>
-                        <p class="text-xs text-slate-500">Selaraskan data merentas peranti melalui pangkalan data terpusat</p>
-                    </div>
-                </div>
-                <button id="btn-tutup-firebase" class="text-slate-400 p-1.5 hover:bg-slate-50 rounded-lg">✕</button>
-            </div>
-
-            <div class="space-y-4">
-                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3 text-xs text-indigo-900 leading-relaxed">
-                    <p class="font-semibold mb-1">Status: <span id="teks-status-firebase">Tidak disambungkan</span></p>
-                    <p>Tampal blok konfigurasi Firebase projek anda di bawah. Anda boleh menyalinnya daripada Firebase Console melalui Project Settings, di bahagian "Your apps".</p>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Konfigurasi Firebase (firebaseConfig) <span class="text-red-500">*</span></label>
-                    <textarea id="input-firebase-config" rows="9" placeholder='const firebaseConfig = {
-  apiKey: "AIzaSyDeurFWf8KEWLGJKA2FAuBPszsoXIFCL2k",
-  authDomain: "bajet-ppa.firebaseapp.com",
-  projectId: "bajet-ppa",
-  storageBucket: "bajet-ppa.firebasestorage.app",
-  messagingSenderId: "1042526189973",
-  appId: "1:1042526189973:web:b7d26f3da47b3371a29e9c",
-  measurementId: "G-ZV2247C87Z"
-};' class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white font-mono placeholder:text-slate-400"></textarea>
-                </div>
-
-                <div class="flex gap-2">
-                    <button type="button" id="btn-putus-firebase" class="w-1/2 bg-slate-100 text-slate-700 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-200">Putuskan Sambungan</button>
-                    <button type="button" id="btn-simpan-firebase" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-semibold shadow-sm">Simpan & Aktifkan</button>
-                </div>
-
-                <p class="text-[11px] text-slate-400 leading-relaxed border-t border-slate-100 pt-3">
-                    Nota: Pastikan kaedah log masuk "Anonymous" diaktifkan dalam Firebase Authentication, dan peraturan Firestore membenarkan akses. Selepas disambungkan, halaman akan dimuatkan semula untuk mengaktifkan penyegerakan masa nyata.
-                </p>
-            </div>
-        </div>
-    </div>
 
     <!-- MODAL SUNTING REKOD TRANSAKSI -->
     <div id="modal-edit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 invisible transition-all duration-300">
@@ -779,7 +686,6 @@
         let transaksi = [];                 // senarai rekod perbelanjaan
         let peruntukan = {};                // peruntukan[tahun] = {K1..K5}
         let rekodCSVDiimport = [];          // simpanan sementara import CSV
-        let gsheetUrl = '';                 // pautan Web App Google Apps Script
 
         const tahunSemasaSistem = new Date().getFullYear();
         let tahunAktif = (tahunSemasaSistem >= 2023 && tahunSemasaSistem <= 2050) ? tahunSemasaSistem : 2026;
@@ -790,38 +696,11 @@
         let chartPieInstance = null;
         let chartYearlyInstance = null;
 
-        // ====================================================================
-        // 0.3 KONFIGURASI FIREBASE
-        // ====================================================================
-        // MOD ONLINE SEPENUHNYA (semua peranti hanya buka pautan, tanpa menampal):
-        //   Isikan keenam-enam medan di bawah dengan kredensial projek Firebase
-        //   anda (salin daripada Firebase Console). Sebaik sahaja "projectId"
-        //   diisi, penyegerakan awan AKAN DIAKTIFKAN secara automatik untuk
-        //   setiap peranti yang membuka fail ini. Tiada langkah lain diperlukan.
-        //
-        //   Biarkan kosong untuk beroperasi menggunakan memori tempatan
-        //   (localStorage) sahaja, atau guna butang "Sambung Firebase" untuk
-        //   menyambung secara per-peranti.
-        // --------------------------------------------------------------------
-        let firebaseConfig = {
-            apiKey: "",
-            authDomain: "",
-            projectId: "",
-            storageBucket: "",
-            messagingSenderId: "",
-            appId: ""
-        };
-        // Diaktifkan secara automatik jika konfigurasi tetap di atas telah diisi.
-        let isFirebaseEnabled = false;
-        const appId = 'ppa-kias-bajet';
-        let auth = null;
-        let db = null;
 
         // ---------- 0.4 KEGIGIHAN DATA (LOCALSTORAGE, TERJAGA) ----------
         function simpanData() {
-            if (isFirebaseEnabled) return; // sumber kebenaran ialah Firestore
             try {
-                const muatan = JSON.stringify({ transaksi, peruntukan, gsheetUrl, tahunAktif });
+                const muatan = JSON.stringify({ transaksi, peruntukan, tahunAktif });
                 window.localStorage.setItem(STORAGE_KEY, muatan);
             } catch (e) {
                 // Persekitaran tanpa localStorage: data kekal dalam memori sesi sahaja
@@ -836,7 +715,6 @@
                 const data = JSON.parse(muatan);
                 if (Array.isArray(data.transaksi)) transaksi = data.transaksi;
                 if (data.peruntukan && typeof data.peruntukan === 'object') peruntukan = data.peruntukan;
-                if (typeof data.gsheetUrl === 'string') gsheetUrl = data.gsheetUrl;
                 if (Number.isInteger(data.tahunAktif) && data.tahunAktif >= 2023 && data.tahunAktif <= 2050) {
                     tahunAktif = data.tahunAktif;
                 }
@@ -1089,35 +967,8 @@
 
         // ---------- 0.11 PENGENDALI BORANG PERBELANJAAN ----------
         async function tambahTransaksi(rekod) {
-            if (isFirebaseEnabled && db && auth && auth.currentUser) {
-                try {
-                    const ref = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('transactions');
-                    await ref.doc(String(rekod.id)).set({
-                        tarikh: rekod.tarikh, tarikhTamat: rekod.tarikhTamat || rekod.tarikh, kategori: rekod.kategori, aktiviti: rekod.aktiviti,
-                        perincian: rekod.perincian, catatan: rekod.catatan || '', jumlah: rekod.jumlah
-                    });
-                    return; // listener masa nyata akan mengemaskini paparan
-                } catch (e) {
-                    console.error('Gagal menulis ke Firestore, beralih ke memori tempatan.', e);
-                }
-            }
             transaksi.push(rekod);
             kemaskiniSemua();
-        }
-
-        // Hantar satu rekod ke Google Sheets (jika pautan dikonfigurasi)
-        async function hantarRekodKeGsheet(rekod) {
-            if (!gsheetUrl) return;
-            try {
-                await fetch(gsheetUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'tambah', rekod: rekod, tahun: new Date(rekod.tarikh).getFullYear() })
-                });
-            } catch (e) {
-                console.error('Gagal menghantar rekod ke Google Sheets:', e);
-            }
         }
 
         document.getElementById('form-perbelanjaan')?.addEventListener('submit', async function (e) {
@@ -1146,15 +997,11 @@
             };
 
             await tambahTransaksi(rekod);
-            hantarRekodKeGsheet(rekod); // hantar ke Google Sheets secara automatik (jika disambungkan)
 
             this.reset();
             const inputMula = document.getElementById('input-tarikh-mula');
             if (inputMula) inputMula.value = `${tahunAktif}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
-            const mesej = gsheetUrl
-                ? 'Rekod perbelanjaan baharu disimpan dan dihantar ke Google Sheets.'
-                : 'Rekod perbelanjaan baharu berjaya didaftarkan.';
-            paparNotifikasi('Rekod Disimpan', mesej);
+            paparNotifikasi('Rekod Disimpan', 'Rekod perbelanjaan baharu berjaya didaftarkan.');
         });
 
         // ---------- 0.12 PADAM TRANSAKSI (DELEGASI ACARA) ----------
@@ -1164,16 +1011,8 @@
             const id = btn.getAttribute('data-id');
             if (!confirm('Padam rekod perbelanjaan ini? Tindakan ini tidak boleh diundur.')) return;
 
-            if (isFirebaseEnabled && db) {
-                try {
-                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('transactions').doc(String(id)).delete();
-                } catch (err) {
-                    console.error('Gagal memadam dari Firestore.', err);
-                }
-            } else {
-                transaksi = transaksi.filter(t => String(t.id) !== String(id));
-                kemaskiniSemua();
-            }
+            transaksi = transaksi.filter(t => String(t.id) !== String(id));
+            kemaskiniSemua();
             paparNotifikasi('Rekod Dipadam', 'Rekod perbelanjaan telah dialih keluar.');
         });
 
@@ -1212,16 +1051,7 @@
             document.getElementById(idBtn)?.addEventListener('click', () => tutupModal('modal-edit', 'modal-edit-content'));
         });
 
-        async function editTransaksi(id, dataBaharu) {
-            if (isFirebaseEnabled && db) {
-                try {
-                    await db.collection('artifacts').doc(appId).collection('public').doc('data')
-                        .collection('transactions').doc(String(id)).set(dataBaharu, { merge: true });
-                    return; // pendengar masa nyata akan mengemaskini paparan
-                } catch (e) {
-                    console.error('Gagal mengemas kini di Firestore, beralih ke memori tempatan.', e);
-                }
-            }
+        function editTransaksi(id, dataBaharu) {
             const idx = transaksi.findIndex(t => String(t.id) === String(id));
             if (idx !== -1) {
                 transaksi[idx] = Object.assign({}, transaksi[idx], dataBaharu);
@@ -1313,58 +1143,10 @@
             });
             peruntukan[tahunAktif] = baharu;
             kemaskiniSemua();
-            tulisPeruntukanFirestore(); // segerak tetapan bajet ke Firestore (jika disambungkan)
             tutupModal('modal-bajet', 'modal-content');
-            const mesej = isFirebaseEnabled
-                ? `Had peruntukan bagi Tahun ${tahunAktif} disimpan dan disegerakkan ke Firebase.`
-                : `Had peruntukan bagi Tahun ${tahunAktif} berjaya disimpan.`;
-            paparNotifikasi('Belanjawan Dikemas Kini', mesej);
+            paparNotifikasi('Belanjawan Dikemas Kini', `Had peruntukan bagi Tahun ${tahunAktif} berjaya disimpan.`);
         });
 
-        // ---------- 0.15 MODAL GOOGLE SHEETS ----------
-        function kemaskiniBadgeGsheet() {
-            const badge = document.getElementById('badge-gsheet-status');
-            if (!badge) return;
-            badge.classList.toggle('bg-emerald-400', !!gsheetUrl);
-            badge.classList.toggle('bg-rose-500', !gsheetUrl);
-        }
-
-        document.getElementById('btn-buka-modal-gsheet')?.addEventListener('click', function () {
-            const inp = document.getElementById('input-gsheet-url');
-            if (inp) inp.value = gsheetUrl;
-            bukaModal('modal-gsheet', 'modal-gsheet-content');
-        });
-
-        ['btn-tutup-gsheet', 'btn-batal-gsheet'].forEach(id => {
-            document.getElementById(id)?.addEventListener('click', () => tutupModal('modal-gsheet', 'modal-gsheet-content'));
-        });
-
-        document.getElementById('btn-simpan-gsheet')?.addEventListener('click', function () {
-            const inp = document.getElementById('input-gsheet-url');
-            gsheetUrl = (inp?.value || '').trim();
-            kemaskiniBadgeGsheet();
-            simpanData();
-            tutupModal('modal-gsheet', 'modal-gsheet-content');
-            paparNotifikasi(gsheetUrl ? 'Pautan Disimpan' : 'Pautan Dikosongkan',
-                gsheetUrl ? 'Pautan Google Sheets berjaya disimpan.' : 'Pautan Google Sheets telah dialih keluar.');
-        });
-
-        document.getElementById('btn-hantar-pukal-gsheet')?.addEventListener('click', async function () {
-            if (!gsheetUrl) { paparNotifikasi('Tiada Pautan', 'Sila simpan Web App URL terlebih dahulu.', true); return; }
-            paparNotifikasi('Menghantar Data', 'Sedang menghantar rekod ke Google Sheets...');
-            try {
-                await fetch(gsheetUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'pukal', tahun: tahunAktif, rekod: dapatkanTransaksiTahunAktif() })
-                });
-                paparNotifikasi('Hantaran Selesai', 'Data telah dihantar ke Google Sheets (mod no-cors).');
-            } catch (e) {
-                console.error(e);
-                paparNotifikasi('Ralat Hantaran', 'Gagal menghubungi Google Apps Script.', true);
-            }
-        });
 
         // ---------- 0.16 PENAPIS JADUAL ----------
         ['filter-cari', 'filter-kategori', 'filter-aktiviti', 'filter-bulan'].forEach(id => {
@@ -1382,167 +1164,31 @@
 
         // ---------- 0.18 EKSPORT CSV JADUAL TRANSAKSI ----------
         document.getElementById('btn-eksport')?.addEventListener('click', function () {
-            const senarai = transaksiTertapis();
+            // Eksport KESELURUHAN data (semua tahun), bukan hanya tahun semasa
+            const senarai = [...transaksi].sort((a, b) => new Date(a.tarikh) - new Date(b.tarikh));
             if (senarai.length === 0) { paparNotifikasi('Tiada Data', 'Tiada rekod untuk dieksport.', true); return; }
-            let csv = "ID,Tarikh Mula,Tarikh Tamat,Kod Kategori,Kategori Utama,Kod Aktiviti,Aktiviti,Perincian,Catatan,Jumlah (RM)\r\n";
+            let csv = "ID,Tarikh Mula,Tarikh Tamat,Kod Kategori,Kategori Utama,Kod Aktiviti,Aktiviti,Perincian,Catatan,Jumlah (RM),Tahun\r\n";
             senarai.forEach(t => {
-                const baris = [t.id, t.tarikh, t.tarikhTamat || t.tarikh, t.kategori, NAMA_KATEGORI[t.kategori] || '', t.aktiviti, NAMA_AKTIVITI[t.aktiviti] || '', t.perincian || '', t.catatan || '', Number(t.jumlah).toFixed(2)];
+                const tahun = new Date(t.tarikh).getFullYear();
+                const baris = [t.id, t.tarikh, t.tarikhTamat || t.tarikh, t.kategori, NAMA_KATEGORI[t.kategori] || '', t.aktiviti, NAMA_AKTIVITI[t.aktiviti] || '', t.perincian || '', t.catatan || '', Number(t.jumlah).toFixed(2), tahun];
                 csv += baris.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + "\r\n";
             });
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `Transaksi_PPA_KIAS_${tahunAktif}.csv`;
+            const cap = new Date().toISOString().slice(0, 10);
+            link.download = `Data_Penuh_Bajet_PPA_KIAS_${cap}.csv`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-            paparNotifikasi('Eksport Berjaya', 'Fail CSV transaksi berjaya dijana.');
+            paparNotifikasi('Eksport Berjaya', `Fail CSV mengandungi ${senarai.length} rekod (semua tahun) berjaya dijana.`);
         });
 
-        // ---------- 0.19 INTEGRASI FIREBASE (TERJAGA) ----------
-        async function initAuth() {
-            if (!isFirebaseEnabled) return;
-            if (!firebase.apps || firebase.apps.length === 0) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            auth = firebase.auth();
-            db = firebase.firestore();
-            await auth.signInAnonymously();
-        }
 
-        function setupRealtimeListeners(user) {
-            if (!isFirebaseEnabled || !db) return;
-
-            // Pendengar transaksi (dua hala)
-            const refTransaksi = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('transactions');
-            refTransaksi.onSnapshot(snap => {
-                transaksi = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
-                kemaskiniSemua();
-            }, err => console.error('Ralat pendengar transaksi:', err));
-
-            // Pendengar tetapan bajet (dua hala)
-            const refPeruntukan = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('settings').doc('peruntukan');
-            refPeruntukan.onSnapshot(snap => {
-                if (snap.exists) {
-                    const d = snap.data();
-                    if (d && d.data && typeof d.data === 'object') {
-                        peruntukan = d.data;
-                        kemaskiniSemua();
-                    }
-                }
-            }, err => console.error('Ralat pendengar peruntukan:', err));
-        }
-
-        // Tulis tetapan bajet ke Firestore (dipanggil semasa menyimpan had bajet)
-        async function tulisPeruntukanFirestore() {
-            if (!isFirebaseEnabled || !db) return;
-            try {
-                await db.collection('artifacts').doc(appId).collection('public').doc('data')
-                    .collection('settings').doc('peruntukan').set({ data: peruntukan }, { merge: true });
-            } catch (e) {
-                console.error('Gagal menyegerak tetapan bajet ke Firestore:', e);
-            }
-        }
-
-        // ---------- 0.19b PENGURUSAN KONFIGURASI FIREBASE ----------
-        const FIREBASE_KEY = 'ppa_kias_firebase_v1';
-
-        function muatKonfigFirebase() {
-            try {
-                const raw = window.localStorage.getItem(FIREBASE_KEY);
-                if (!raw) return;
-                const o = JSON.parse(raw);
-                if (o && o.config && o.config.projectId) {
-                    firebaseConfig = o.config;
-                    isFirebaseEnabled = !!o.enabled;
-                }
-            } catch (e) {
-                console.warn('Gagal memuat konfigurasi Firebase.', e);
-            }
-        }
-
-        function huraikanKonfigFirebase(teks) {
-            const t = (teks || '').trim();
-            const mula = t.indexOf('{');
-            const akhir = t.lastIndexOf('}');
-            if (mula === -1 || akhir === -1) throw new Error('Format konfigurasi tidak sah.');
-            const dalam = t.slice(mula + 1, akhir);
-            const cfg = {};
-            const re = /([A-Za-z0-9_]+)\s*:\s*["']([^"']*)["']/g;
-            let m;
-            while ((m = re.exec(dalam)) !== null) { cfg[m[1]] = m[2]; }
-            if (!cfg.apiKey || !cfg.projectId || !cfg.appId) {
-                throw new Error('Konfigurasi tidak lengkap (perlu sekurang-kurangnya apiKey, projectId dan appId).');
-            }
-            return cfg;
-        }
-
-        function kemaskiniBadgeFirebase() {
-            const badge = document.getElementById('badge-firebase-status');
-            if (badge) {
-                badge.classList.toggle('bg-emerald-400', isFirebaseEnabled);
-                badge.classList.toggle('bg-rose-500', !isFirebaseEnabled);
-            }
-            const teks = document.getElementById('teks-status-firebase');
-            if (teks) {
-                teks.textContent = isFirebaseEnabled
-                    ? ('Disambungkan' + (firebaseConfig.projectId ? ` (${firebaseConfig.projectId})` : ''))
-                    : 'Tidak disambungkan';
-            }
-        }
-
-        document.getElementById('btn-buka-modal-firebase')?.addEventListener('click', function () {
-            const ta = document.getElementById('input-firebase-config');
-            if (ta && firebaseConfig && firebaseConfig.projectId) {
-                ta.value = 'const firebaseConfig = ' + JSON.stringify(firebaseConfig, null, 2) + ';';
-            }
-            kemaskiniBadgeFirebase();
-            bukaModal('modal-firebase', 'modal-firebase-content');
-        });
-
-        document.getElementById('btn-tutup-firebase')?.addEventListener('click', () => tutupModal('modal-firebase', 'modal-firebase-content'));
-
-        document.getElementById('btn-simpan-firebase')?.addEventListener('click', function () {
-            const teks = document.getElementById('input-firebase-config')?.value || '';
-            let cfg;
-            try {
-                cfg = huraikanKonfigFirebase(teks);
-            } catch (e) {
-                paparNotifikasi('Konfigurasi Tidak Sah', e.message, true);
-                return;
-            }
-            try {
-                window.localStorage.setItem(FIREBASE_KEY, JSON.stringify({ config: cfg, enabled: true }));
-            } catch (e) {
-                paparNotifikasi('Ralat Storan', 'Gagal menyimpan konfigurasi pada pelayar.', true);
-                return;
-            }
-            paparNotifikasi('Firebase Disambung', 'Memuatkan semula untuk mengaktifkan penyegerakan masa nyata...');
-            setTimeout(() => window.location.reload(), 1000);
-        });
-
-        document.getElementById('btn-putus-firebase')?.addEventListener('click', function () {
-            try {
-                const raw = window.localStorage.getItem(FIREBASE_KEY);
-                const o = raw ? JSON.parse(raw) : { config: firebaseConfig };
-                window.localStorage.setItem(FIREBASE_KEY, JSON.stringify({ config: o.config || firebaseConfig, enabled: false }));
-            } catch (e) {
-                window.localStorage.removeItem(FIREBASE_KEY);
-            }
-            paparNotifikasi('Sambungan Diputuskan', 'Memuatkan semula untuk beralih ke memori tempatan...');
-            setTimeout(() => window.location.reload(), 1000);
-        });
-
-        // ---------- 0.20 PEMULAAN AWAL (sebelum window.onload skrip kedua) ----------
-        // Mod online sepenuhnya: jika konfigurasi tetap telah diisi dalam kod,
-        // aktifkan penyegerakan secara automatik untuk setiap peranti yang membuka pautan.
-        if (firebaseConfig && firebaseConfig.projectId) { isFirebaseEnabled = true; }
-        muatKonfigFirebase();   // sambungan per-peranti dalam localStorage boleh menggantikan tetapan di atas
+        // ---------- 0.20 PEMULAAN AWAL ----------
         muatData();
-        kemaskiniBadgeGsheet();
-        kemaskiniBadgeFirebase();
         // Paparkan carta lalai (bar) pada permulaan
         document.addEventListener('DOMContentLoaded', () => { tukarCarta('bar'); });
 
@@ -1836,7 +1482,8 @@
                 const header = parseBarisCSV(rows[0]);
                 const idx = {
                     id: header.findIndex(h => h.toLowerCase().includes('id')),
-                    tarikh: header.findIndex(h => h.toLowerCase().includes('tarikh')),
+                    tarikh: header.findIndex(h => h.toLowerCase().includes('tarikh') && !h.toLowerCase().includes('tamat')),
+                    tarikhTamat: header.findIndex(h => h.toLowerCase().includes('tamat')),
                     kategori: header.findIndex(h => h.toLowerCase().includes('kategori')),
                     aktiviti: header.findIndex(h => h.toLowerCase().includes('aktiviti')),
                     perincian: header.findIndex(h => h.toLowerCase().includes('perincian')),
@@ -1866,6 +1513,7 @@
                     list.push({
                         id: idx.id !== -1 ? cols[idx.id] : String(Date.now() + i),
                         tarikh: rawDate,
+                        tarikhTamat: (idx.tarikhTamat !== -1 && cols[idx.tarikhTamat]) ? cols[idx.tarikhTamat] : rawDate,
                         kategori: idx.kategori !== -1 ? semakKodKategori(cols[idx.kategori]) : 'K1',
                         aktiviti: idx.aktiviti !== -1 ? semakKodAktiviti(cols[idx.aktiviti]) : 'ACT1',
                         perincian: idx.perincian !== -1 ? cols[idx.perincian] : 'Diimport dari CSV',
@@ -1891,55 +1539,18 @@
         document.getElementById('btn-sahkan-import').addEventListener('click', async function() {
             const mode = document.querySelector('input[name="opt-import"]:checked').value;
             
-            if (isFirebaseEnabled) {
-                const user = auth.currentUser;
-                if (!user) return; // Guard (RULE 3)
-                const transactionsColRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('transactions');
-                paparNotifikasi("Memproses", "Sedang mengimport data perbelanjaan ke awan...");
-
-                try {
-                    if (mode === 'overwrite') {
-                        const snap = await transactionsColRef.get();
-                        const batch = db.batch();
-                        snap.docs.forEach(doc => batch.delete(doc.ref));
-                        await batch.commit();
-                    }
-
-                    for (let i = 0; i < rekodCSVDiimport.length; i++) {
-                        const item = rekodCSVDiimport[i];
-                        let finalId = String(item.id);
-                        if (mode === 'merge' && transaksi.some(t => String(t.id) === finalId)) {
-                            finalId = String(Date.now() + Math.floor(Math.random() * 1000000));
-                        }
-                        await transactionsColRef.doc(finalId).set({
-                            tarikh: item.tarikh,
-                            kategori: item.kategori,
-                            aktiviti: item.aktiviti,
-                            perincian: item.perincian,
-                            catatan: item.catatan || "",
-                            jumlah: item.jumlah
-                        });
-                    }
-                    paparNotifikasi("Import Selesai", `Berjaya mengimport ${rekodCSVDiimport.length} rekod ke Firestore.`);
-                } catch(e) {
-                    console.error(e);
-                    paparNotifikasi("Ralat", "Gagal mengimport rekod ke Firestore.", true);
-                }
+            if (mode === 'overwrite') {
+                transaksi = [...rekodCSVDiimport];
             } else {
-                // Fallback Tempatan Semasa Offline
-                if (mode === 'overwrite') {
-                    transaksi = [...rekodCSVDiimport];
-                } else {
-                    rekodCSVDiimport.forEach(item => {
-                        if (transaksi.some(t => String(t.id) === String(item.id))) {
-                            item.id = String(Date.now() + Math.floor(Math.random() * 1000000));
-                        }
-                        transaksi.push(item);
-                    });
-                }
-                kemaskiniSemua();
-                paparNotifikasi("Import Selesai", `Berjaya mengimport ${rekodCSVDiimport.length} rekod ke memori.`);
+                rekodCSVDiimport.forEach(item => {
+                    if (transaksi.some(t => String(t.id) === String(item.id))) {
+                        item.id = String(Date.now() + Math.floor(Math.random() * 1000000));
+                    }
+                    transaksi.push(item);
+                });
             }
+            kemaskiniSemua();
+            paparNotifikasi("Import Selesai", `Berjaya mengimport ${rekodCSVDiimport.length} rekod (keseluruhan data dikemas kini).`);
 
             document.getElementById('modal-import').classList.add('invisible', 'opacity-0');
             document.getElementById('modal-import-content').classList.replace('scale-100', 'scale-95');
@@ -2070,25 +1681,7 @@
             // Kemaskini visualisasi segera untuk mendraf data awal
             kemaskiniSemua();
 
-            // Mulakan penyambungan awan sekiranya kod konfigurasi Firebase sah dibekalkan
-            if (isFirebaseEnabled) {
-                try {
-                    await initAuth(); // Tunggu sehingga log masuk selesai
-                    
-                    // Gunakan listener auth state change untuk ketepatan status user (RULE 3)
-                    firebase.auth().onAuthStateChanged((user) => {
-                        if (user) {
-                            setupRealtimeListeners(user);
-                        }
-                    });
-                } catch(e) {
-                    console.error("Auth init failed, switching to local memory fallback mode:", e);
-                    isFirebaseEnabled = false;
-                    kemaskiniSemua();
-                }
-            } else {
-                paparNotifikasi("Memori Tempatan Aktif", "Dashboard beroperasi menggunakan memori tempatan pelayar web secara selamat.");
-            }
+            paparNotifikasi("Dashboard Sedia", "Data disimpan secara tempatan dalam pelayar web ini.");
         };
 
     </script>
