@@ -853,7 +853,23 @@
             const kodKategori = Object.keys(NAMA_KATEGORI);
 
             // (a) Bar: Siling vs Belanja mengikut kategori
-            const labelKategori = kodKategori.map(k => k.replace('K', 'Kat '));
+            // Bungkus nama kategori penuh kepada beberapa baris supaya kemas pada paksi
+            const bungkusLabel = (teks, maks) => {
+                const perkataan = String(teks).split(' ');
+                const baris = [];
+                let semasa = '';
+                perkataan.forEach(pk => {
+                    if ((semasa + ' ' + pk).trim().length > maks && semasa) {
+                        baris.push(semasa.trim());
+                        semasa = pk;
+                    } else {
+                        semasa = (semasa + ' ' + pk).trim();
+                    }
+                });
+                if (semasa) baris.push(semasa.trim());
+                return baris;
+            };
+            const labelKategori = kodKategori.map(k => bungkusLabel(NAMA_KATEGORI[k], 18));
             const dataSiling = kodKategori.map(k => Number(p[k]) || 0);
             const dataBelanja = kodKategori.map(k => transaksiTahun.filter(t => t.kategori === k).reduce((s, t) => s + t.jumlah, 0));
 
@@ -866,7 +882,7 @@
                             { label: 'Peruntukan Siling', data: dataSiling, backgroundColor: '#a7f3d0', borderRadius: 6 },
                             { label: 'Belanja Sebenar', data: dataBelanja, backgroundColor: '#059669', borderRadius: 6 }
                         ] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, ticks: { callback: v => 'RM ' + v.toLocaleString('en-MY') } } } }
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { x: { ticks: { autoSkip: false, maxRotation: 0, minRotation: 0, font: { size: 10 } } }, y: { beginAtZero: true, ticks: { callback: v => 'RM ' + v.toLocaleString('en-MY') } } } }
                     });
                 } else {
                     chartBarInstance.data.labels = labelKategori;
