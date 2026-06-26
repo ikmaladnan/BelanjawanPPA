@@ -609,8 +609,9 @@
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 m-4 transform scale-95 transition-all duration-300" id="modal-import-content">
             <div class="text-center mb-5">
                 <span class="inline-flex p-3 bg-emerald-50 text-emerald-600 rounded-2xl mb-3">📥</span>
-                <h3 class="text-lg font-bold text-slate-900">Import Data Belanja (CSV)</h3>
-                <p class="text-xs text-slate-500 mt-1">Sistem mengesan <span id="span-jumlah-import" class="font-bold text-emerald-700 text-sm">0</span> rekod sedia untuk diimport.</p>
+                <h3 class="text-lg font-bold text-slate-900">Import Data Penuh (CSV)</h3>
+                <p class="text-xs text-slate-500 mt-1">Sistem mengesan: <span id="span-jumlah-import" class="font-bold text-emerald-700 text-sm">0</span></p>
+                <p class="text-[11px] text-slate-400 mt-1">Merangkumi tetapan bajet dan rekod transaksi.</p>
             </div>
 
             <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 space-y-2.5 mb-6 text-xs text-slate-600">
@@ -620,12 +621,14 @@
                         <input type="radio" name="opt-import" id="opt-merge" value="merge" checked class="mt-0.5 text-emerald-600 focus:ring-emerald-500">
                         <div class="ml-2">
                             <p class="font-bold text-slate-800 text-xs">Gabungkan Data (Merge)</p>
+                            <p class="text-[11px] text-slate-500">Tambah transaksi baharu dan kemas kini tetapan bajet tahun berkenaan.</p>
                         </div>
                     </label>
                     <label class="flex items-start gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
                         <input type="radio" name="opt-import" id="opt-overwrite" value="overwrite" class="mt-0.5 text-emerald-600 focus:ring-emerald-500">
                         <div class="ml-2">
                             <p class="font-bold text-slate-800 text-xs">Gantikan Semua (Overwrite)</p>
+                            <p class="text-[11px] text-slate-500">Ganti keseluruhan transaksi dan tetapan bajet dengan kandungan fail.</p>
                         </div>
                     </label>
                 </div>
@@ -685,7 +688,8 @@
         // ---------- 0.2 KEADAAN APLIKASI (GLOBAL DIKONGSI ANTARA SKRIP) ----------
         let transaksi = [];                 // senarai rekod perbelanjaan
         let peruntukan = {};                // peruntukan[tahun] = {K1..K5}
-        let rekodCSVDiimport = [];          // simpanan sementara import CSV
+        let rekodCSVDiimport = [];          // simpanan sementara import CSV (transaksi)
+        let peruntukanCSVDiimport = {};     // simpanan sementara import CSV (tetapan bajet)
 
         const tahunSemasaSistem = new Date().getFullYear();
         let tahunAktif = (tahunSemasaSistem >= 2023 && tahunSemasaSistem <= 2050) ? tahunSemasaSistem : 2026;
@@ -1164,15 +1168,39 @@
 
         // ---------- 0.18 EKSPORT CSV JADUAL TRANSAKSI ----------
         document.getElementById('btn-eksport')?.addEventListener('click', function () {
-            // Eksport KESELURUHAN data (semua tahun), bukan hanya tahun semasa
+            // EKSPORT UTAMA: keseluruhan data (tetapan bajet + rekod transaksi semua tahun)
             const senarai = [...transaksi].sort((a, b) => new Date(a.tarikh) - new Date(b.tarikh));
-            if (senarai.length === 0) { paparNotifikasi('Tiada Data', 'Tiada rekod untuk dieksport.', true); return; }
-            let csv = "ID,Tarikh Mula,Tarikh Tamat,Kod Kategori,Kategori Utama,Kod Aktiviti,Aktiviti,Perincian,Catatan,Jumlah (RM),Tahun\r\n";
+            const adaBajet = Object.keys(peruntukan).some(th => Object.values(peruntukan[th] || {}).some(v => Number(v) > 0));
+
+            if (senarai.length === 0 && !adaBajet) {
+                paparNotifikasi('Tiada Data', 'Tiada tetapan bajet atau rekod untuk dieksport.', true);
+                return;
+            }
+
+            const lajur = ["Jenis", "Tahun", "Kod Kategori", "Kategori Utama", "Kod Aktiviti", "Aktiviti", "ID", "Tarikh Mula", "Tarikh Tamat", "Perincian", "Catatan", "Jumlah (RM)"];
+            const sebutHarga = (nilai) => `"${String(nilai).replace(/"/g, '""')}"`;
+            let csv = lajur.join(',') + "\r\n";
+
+            // Bahagian 1: Tetapan Bajet (satu baris bagi setiap kategori setiap tahun)
+            let bilBajet = 0;
+            Object.keys(peruntukan).sort().forEach(tahun => {
+                const p = peruntukan[tahun] || {};
+                ['K1', 'K2', 'K3', 'K4', 'K5'].forEach(kod => {
+                    const jum = Number(p[kod]) || 0;
+                    if (jum <= 0) return;
+                    bilBajet++;
+                    const baris = ["BAJET", tahun, kod, NAMA_KATEGORI[kod] || '', '', '', '', '', '', '', '', jum.toFixed(2)];
+                    csv += baris.map(sebutHarga).join(',') + "\r\n";
+                });
+            });
+
+            // Bahagian 2: Rekod Transaksi
             senarai.forEach(t => {
                 const tahun = new Date(t.tarikh).getFullYear();
-                const baris = [t.id, t.tarikh, t.tarikhTamat || t.tarikh, t.kategori, NAMA_KATEGORI[t.kategori] || '', t.aktiviti, NAMA_AKTIVITI[t.aktiviti] || '', t.perincian || '', t.catatan || '', Number(t.jumlah).toFixed(2), tahun];
-                csv += baris.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + "\r\n";
+                const baris = ["TRANSAKSI", tahun, t.kategori, NAMA_KATEGORI[t.kategori] || '', t.aktiviti, NAMA_AKTIVITI[t.aktiviti] || '', t.id, t.tarikh, t.tarikhTamat || t.tarikh, t.perincian || '', t.catatan || '', Number(t.jumlah).toFixed(2)];
+                csv += baris.map(sebutHarga).join(',') + "\r\n";
             });
+
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -1183,7 +1211,7 @@
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-            paparNotifikasi('Eksport Berjaya', `Fail CSV mengandungi ${senarai.length} rekod (semua tahun) berjaya dijana.`);
+            paparNotifikasi('Eksport Berjaya', `Fail CSV utama dijana: ${bilBajet} tetapan bajet dan ${senarai.length} rekod transaksi.`);
         });
 
 
@@ -1480,50 +1508,71 @@
                 if (rows.length < 2) return;
 
                 const header = parseBarisCSV(rows[0]);
+                const cari = (kunci, kecuali) => header.findIndex(h => {
+                    const t = h.toLowerCase();
+                    return t.includes(kunci) && (!kecuali || !t.includes(kecuali));
+                });
                 const idx = {
-                    id: header.findIndex(h => h.toLowerCase().includes('id')),
-                    tarikh: header.findIndex(h => h.toLowerCase().includes('tarikh') && !h.toLowerCase().includes('tamat')),
-                    tarikhTamat: header.findIndex(h => h.toLowerCase().includes('tamat')),
-                    kategori: header.findIndex(h => h.toLowerCase().includes('kategori')),
-                    aktiviti: header.findIndex(h => h.toLowerCase().includes('aktiviti')),
-                    perincian: header.findIndex(h => h.toLowerCase().includes('perincian')),
-                    catatan: header.findIndex(h => h.toLowerCase().includes('catatan')),
-                    jumlah: header.findIndex(h => h.toLowerCase().includes('jumlah'))
+                    jenis: cari('jenis'),
+                    id: cari('id'),
+                    tahun: cari('tahun'),
+                    tarikh: cari('tarikh', 'tamat'),
+                    tarikhTamat: cari('tamat'),
+                    kategori: cari('kategori'),
+                    aktiviti: cari('aktiviti'),
+                    perincian: cari('perincian'),
+                    catatan: cari('catatan'),
+                    jumlah: cari('jumlah')
                 };
 
-                if (idx.tarikh === -1 || idx.jumlah === -1) {
-                    paparNotifikasi("Format Salah", "Pengepala CSV tidak sah.", true);
+                if (idx.jumlah === -1) {
+                    paparNotifikasi("Format Salah", "Pengepala CSV tidak sah (lajur Jumlah tidak dijumpai).", true);
                     return;
                 }
 
-                let list = [];
+                const senaraiTransaksi = [];
+                const bajetBaharu = {};
+
                 for (let i = 1; i < rows.length; i++) {
                     const rowText = rows[i].trim();
                     if (!rowText) continue;
-
                     const cols = parseBarisCSV(rowText);
-                    const rawDate = cols[idx.tarikh];
-                    if (!rawDate) continue;
 
-                    let rawAmt = cols[idx.jumlah] || "0";
-                    rawAmt = rawAmt.replace(/[^\d.-]/g, '');
+                    // Tentukan jenis baris. Jika tiada lajur Jenis, anggap sebagai TRANSAKSI (keserasian fail lama).
+                    const jenis = idx.jenis !== -1 ? (cols[idx.jenis] || '').trim().toUpperCase() : 'TRANSAKSI';
+
+                    let rawAmt = (cols[idx.jumlah] || "0").replace(/[^\d.-]/g, '');
                     const amount = parseFloat(rawAmt) || 0;
-                    if (amount <= 0) continue;
 
-                    list.push({
-                        id: idx.id !== -1 ? cols[idx.id] : String(Date.now() + i),
-                        tarikh: rawDate,
-                        tarikhTamat: (idx.tarikhTamat !== -1 && cols[idx.tarikhTamat]) ? cols[idx.tarikhTamat] : rawDate,
-                        kategori: idx.kategori !== -1 ? semakKodKategori(cols[idx.kategori]) : 'K1',
-                        aktiviti: idx.aktiviti !== -1 ? semakKodAktiviti(cols[idx.aktiviti]) : 'ACT1',
-                        perincian: idx.perincian !== -1 ? cols[idx.perincian] : 'Diimport dari CSV',
-                        catatan: idx.catatan !== -1 ? cols[idx.catatan] : '',
-                        jumlah: amount
-                    });
+                    if (jenis === 'BAJET') {
+                        const tahun = parseInt(cols[idx.tahun], 10);
+                        const kod = idx.kategori !== -1 ? semakKodKategori(cols[idx.kategori]) : null;
+                        if (!Number.isInteger(tahun) || !kod) continue;
+                        if (!bajetBaharu[tahun]) bajetBaharu[tahun] = { K1: 0, K2: 0, K3: 0, K4: 0, K5: 0 };
+                        bajetBaharu[tahun][kod] = amount;
+                    } else {
+                        const rawDate = idx.tarikh !== -1 ? cols[idx.tarikh] : '';
+                        if (!rawDate || amount <= 0) continue;
+                        senaraiTransaksi.push({
+                            id: idx.id !== -1 && cols[idx.id] ? cols[idx.id] : String(Date.now() + i),
+                            tarikh: rawDate,
+                            tarikhTamat: (idx.tarikhTamat !== -1 && cols[idx.tarikhTamat]) ? cols[idx.tarikhTamat] : rawDate,
+                            kategori: idx.kategori !== -1 ? semakKodKategori(cols[idx.kategori]) : 'K1',
+                            aktiviti: idx.aktiviti !== -1 ? semakKodAktiviti(cols[idx.aktiviti]) : 'ACT1',
+                            perincian: idx.perincian !== -1 ? cols[idx.perincian] : 'Diimport dari CSV',
+                            catatan: idx.catatan !== -1 ? cols[idx.catatan] : '',
+                            jumlah: amount
+                        });
+                    }
                 }
 
-                rekodCSVDiimport = list;
-                document.getElementById('span-jumlah-import').textContent = list.length;
+                rekodCSVDiimport = senaraiTransaksi;
+                peruntukanCSVDiimport = bajetBaharu;
+                const bilBajet = Object.keys(bajetBaharu).length;
+                const ringkasan = bilBajet > 0
+                    ? `${senaraiTransaksi.length} transaksi + tetapan bajet ${bilBajet} tahun`
+                    : `${senaraiTransaksi.length}`;
+                document.getElementById('span-jumlah-import').textContent = ringkasan;
                 document.getElementById('modal-import').classList.remove('invisible', 'opacity-0');
                 document.getElementById('modal-import-content').classList.replace('scale-95', 'scale-100');
             };
@@ -1538,9 +1587,11 @@
 
         document.getElementById('btn-sahkan-import').addEventListener('click', async function() {
             const mode = document.querySelector('input[name="opt-import"]:checked').value;
-            
+            const adaBajet = Object.keys(peruntukanCSVDiimport).length > 0;
+
             if (mode === 'overwrite') {
                 transaksi = [...rekodCSVDiimport];
+                if (adaBajet) peruntukan = JSON.parse(JSON.stringify(peruntukanCSVDiimport));
             } else {
                 rekodCSVDiimport.forEach(item => {
                     if (transaksi.some(t => String(t.id) === String(item.id))) {
@@ -1548,9 +1599,17 @@
                     }
                     transaksi.push(item);
                 });
+                // Gabung tetapan bajet: nilai yang diimport menggantikan nilai sedia ada bagi tahun/kategori berkenaan
+                Object.keys(peruntukanCSVDiimport).forEach(tahun => {
+                    peruntukan[tahun] = Object.assign({ K1: 0, K2: 0, K3: 0, K4: 0, K5: 0 }, peruntukan[tahun] || {}, peruntukanCSVDiimport[tahun]);
+                });
             }
             kemaskiniSemua();
-            paparNotifikasi("Import Selesai", `Berjaya mengimport ${rekodCSVDiimport.length} rekod (keseluruhan data dikemas kini).`);
+            const bilBajet = Object.keys(peruntukanCSVDiimport).length;
+            const mesej = bilBajet > 0
+                ? `Berjaya mengimport ${rekodCSVDiimport.length} transaksi dan tetapan bajet bagi ${bilBajet} tahun.`
+                : `Berjaya mengimport ${rekodCSVDiimport.length} rekod transaksi.`;
+            paparNotifikasi("Import Selesai", mesej);
 
             document.getElementById('modal-import').classList.add('invisible', 'opacity-0');
             document.getElementById('modal-import-content').classList.replace('scale-100', 'scale-95');
